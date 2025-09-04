@@ -113,7 +113,7 @@
     }
 
     // Initialize SortableJS
-    new Sortable(letterList, {
+    let sortable = new Sortable(letterList, {
       animation: 150,
     });
 
@@ -139,6 +139,9 @@
         result.textContent = "❌ Some are out of order. Check the highlighted ones.";
         correctOrderDiv.textContent = "Correct Order: " + correctOrder.join(", ");
       }
+
+      // Lock the list so it can't be dragged until restart
+      sortable.option("disabled", true);
     });
 
     // Restart button
@@ -146,6 +149,8 @@
       renderList(shuffle(correctOrder));
       result.textContent = "";
       correctOrderDiv.textContent = "";
+      // Enable dragging again
+      sortable.option("disabled", false);
     });
 
     // Start with shuffled order
