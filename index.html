@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Greek Letters</title>
+  <title>Greek Letters Drag & Drop</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f7f7f7;
       padding: 20px;
       text-align: center;
+      margin: 0;
     }
     h1 {
       margin-bottom: 20px;
@@ -18,19 +19,21 @@
       list-style: none;
       padding: 0;
       margin: auto;
-      width: 90%;
+      width: 95%;
       max-width: 800px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      max-height: 80vh;       /* never exceed 80% of viewport height */
+      overflow-y: auto;       /* scroll only if absolutely necessary */
     }
     li {
-      padding: 12px;
+      padding: 8px;
       background: #fff;
       border: 1px solid #ccc;
       cursor: grab;
       transition: background 0.3s;
-      font-size: 1rem;
+      font-size: clamp(0.8rem, 2.5vw, 1rem); /* responsive font */
       user-select: none;
       text-align: center;
       display: flex;
@@ -62,15 +65,12 @@
       margin-left: 5px;
       margin-right: 5px;
     }
-    @media (min-width: 768px) {
-      li {
-        font-size: 1.2rem;
-      }
-    }
   </style>
 </head>
 <body>
   <h1>Drag & Drop Greek Letters</h1>
+  <p>Drag the letters to match the correct order. Numbers show positions after dropping.</p>
+
   <ul id="letterList"></ul>
 
   <div>
@@ -149,7 +149,7 @@
       });
 
       if (allCorrect) {
-        result.textContent = "✅ All are in order!";
+        result.textContent = "✅ Perfect! You got the Greek alphabet in the correct order!";
         correctOrderDiv.textContent = "";
       } else {
         result.textContent = "❌ Some are out of order. Check the highlighted letters.";
@@ -168,6 +168,7 @@
       sortable.option("disabled", false);
     });
 
+    // Start with shuffled list and numbered
     renderList(shuffle(correctOrder));
   </script>
 </body>
