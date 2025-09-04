@@ -71,7 +71,7 @@
 </head>
 <body>
   <h1>Drag & Drop Greek Letters</h1>
-  <img src="Grey_Blue_White.png">
+  <img src="Grey_Blue_White.png" width = "150",height = "150">
   <ul id="letterList"></ul>
 
   <div>
@@ -150,7 +150,7 @@
       });
 
       if (allCorrect) {
-        result.textContent = "✅ Perfect! You got the Greek alphabet in the correct order!";
+        result.textContent = "✅ All are in order!";
         correctOrderDiv.textContent = "";
       } else {
         result.textContent = "❌ Some are out of order. Check the highlighted letters.";
@@ -169,7 +169,6 @@
       sortable.option("disabled", false);
     });
 
-    // Start with shuffled list and numbered
     renderList(shuffle(correctOrder));
   </script>
 </body>
