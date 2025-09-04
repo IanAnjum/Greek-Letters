@@ -17,19 +17,26 @@
     ul {
       list-style: none;
       padding: 0;
-      max-width: 400px;
-      width: 90%;
       margin: auto;
+      width: 90%;
+      max-width: 800px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
     }
     li {
       padding: 12px;
-      margin: 6px 0;
       background: #fff;
       border: 1px solid #ccc;
       cursor: grab;
       transition: background 0.3s;
       font-size: 1rem;
       user-select: none;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
     }
     .correct {
       background-color: #c8f7c5;
@@ -49,7 +56,7 @@
     }
     button {
       margin-top: 20px;
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       cursor: pointer;
       margin-left: 5px;
@@ -64,8 +71,7 @@
 </head>
 <body>
   <h1>Drag & Drop Greek Letters</h1>
-  <p>Reorder the letters to practice memorizing them.</p>
-
+  <img src="Grey_Blue_White.png">
   <ul id="letterList"></ul>
 
   <div>
@@ -76,9 +82,7 @@
   <div id="result"></div>
   <div id="correctOrder"></div>
 
-  <!-- SortableJS library -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
   <script>
     const letterList = document.getElementById("letterList");
     const checkBtn = document.getElementById("checkBtn");
@@ -102,19 +106,31 @@
       return arr;
     }
 
-    // Render the list
+    // Render list and add numbering
     function renderList(letters) {
       letterList.innerHTML = "";
-      letters.forEach(letter => {
+      letters.forEach((letter, index) => {
         const li = document.createElement("li");
-        li.textContent = letter;
+        li.textContent = `${index + 1}. ${letter}`;
         letterList.appendChild(li);
+      });
+    }
+
+    // Update numbers dynamically after sorting
+    function updateNumbers() {
+      const items = [...letterList.querySelectorAll("li")];
+      items.forEach((item, index) => {
+        const text = item.textContent.replace(/^\d+\.\s*/, '');
+        item.textContent = `${index + 1}. ${text}`;
       });
     }
 
     // Initialize SortableJS
     let sortable = new Sortable(letterList, {
       animation: 150,
+      onEnd: () => {
+        updateNumbers();
+      }
     });
 
     // Check order
@@ -124,7 +140,8 @@
 
       items.forEach((item, index) => {
         item.classList.remove("correct", "wrong");
-        if (item.textContent === correctOrder[index]) {
+        const letter = item.textContent.replace(/^\d+\.\s*/, '');
+        if (letter === correctOrder[index]) {
           item.classList.add("correct");
         } else {
           item.classList.add("wrong");
@@ -136,24 +153,23 @@
         result.textContent = "✅ Perfect! You got the Greek alphabet in the correct order!";
         correctOrderDiv.textContent = "";
       } else {
-        result.textContent = "❌ Some are out of order. Check the highlighted ones.";
-        correctOrderDiv.textContent = "Correct Order: " + correctOrder.join(", ");
+        result.textContent = "❌ Some are out of order. Check the highlighted letters.";
+        correctOrderDiv.textContent = "Correct Order: " + correctOrder.map((l,i)=>`${i+1}. ${l}`).join(", ");
       }
 
-      // Lock the list so it can't be dragged until restart
+      // Lock dragging
       sortable.option("disabled", true);
     });
 
-    // Restart button
+    // Restart
     restartBtn.addEventListener("click", () => {
       renderList(shuffle(correctOrder));
       result.textContent = "";
       correctOrderDiv.textContent = "";
-      // Enable dragging again
       sortable.option("disabled", false);
     });
 
-    // Start with shuffled order
+    // Start with shuffled list and numbered
     renderList(shuffle(correctOrder));
   </script>
 </body>
