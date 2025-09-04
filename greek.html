@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Greek Letters Drag & Drop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      width: 220px;
+      margin: auto;
+    }
+    li {
+      padding: 10px;
+      margin: 5px 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      cursor: grab;
+      transition: background 0.3s;
+    }
+    li.dragging {
+      opacity: 0.5;
+    }
+    .correct {
+      background-color: #c8f7c5;
+    }
+    .wrong {
+      background-color: #f7c5c5;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    #correctOrder {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drag & Drop Greek Letters</h1>
+  <p>Reorder the letters to practice memorizing them.</p>
+  
+  <ul id="letterList"></ul>
+
+  <div>
+    <button id="checkBtn">Check Order</button>
+    <button id="restartBtn">Restart</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="correctOrder"></div>
+
+  <script>
+    const list = document.getElementById("letterList");
+    const checkBtn = document.getElementById("checkBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const result = document.getElementById("result");
+    const correctOrderDiv = document.getElementById("correctOrder");
+
+    const correctOrder = [
+      "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta",
+      "Iota", "Kappa", "Lambda", "Mu", "Nu", "Xi", "Omicron", "Pi",
+      "Rho", "Sigma", "Tau", "Upsilon", "Phi", "Chi", "Psi", "Omega"
+    ];
+
+    let draggedItem = null;
+
+    function shuffle(array) {
+      let arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function renderList(letters) {
+      list.innerHTML = "";
+      letters.forEach(letter => {
+        const li = document.createElement("li");
+        li.textContent = letter;
+        li.draggable = true;
+        list.appendChild(li);
+      });
+      addDragEvents();
+    }
+
+    function addDragEvents() {
+      list.querySelectorAll("li").forEach(li => {
+        li.addEventListener("dragstart", (e) => {
+          draggedItem = e.target;
+          e.target.classList.add("dragging");
+        });
+        li.addEventListener("dragend", (e) => {
+          e.target.classList.remove("dragging");
+          draggedItem = null;
+        });
+      });
+
+      list.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(list, e.clientY);
+        if (afterElement == null) {
+          list.appendChild(draggedItem);
+        } else {
+          list.insertBefore(draggedItem, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    checkBtn.addEventListener("click", () => {
+      const items = [...list.querySelectorAll("li")];
+      let allCorrect = true;
+
+      items.forEach((item, index) => {
+        item.classList.remove("correct", "wrong");
+        if (item.textContent === correctOrder[index]) {
+          item.classList.add("correct");
+        } else {
+          item.classList.add("wrong");
+          allCorrect = false;
+        }
+      });
+
+      if (allCorrect) {
+        result.textContent = "✅ Perfect! You got the Greek alphabet in the correct order!";
+        correctOrderDiv.textContent = "";
+      } else {
+        result.textContent = "❌ Some are out of order. Check the highlighted ones.";
+        correctOrderDiv.textContent = "Correct Order: " + correctOrder.join(", ");
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      const shuffled = shuffle(correctOrder);
+      renderList(shuffled);
+      result.textContent = "";
+      correctOrderDiv.textContent = "";
+    });
+
+    // Start with randomized order
+    renderList(shuffle(correctOrder));
+  </script>
+</body>
+</html>
